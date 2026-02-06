@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Terraform
+terraform/.terraform/
+*.tfstate
+*.tfstate.*
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars
+*.tfplan
+
+# GCP
+key.json
+*.json
+!app/requirements.txt
+.gcloud/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker
+.dockerignore
