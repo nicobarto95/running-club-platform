@@ -1,0 +1,5 @@
+# Copia questo file in terraform.tfvars e modifica con i tuoi valori
+
+project_id  = "runner-platform-dublin"  # CAMBIA CON IL TUO PROJECT ID
+region      = "europe-west1"
+environment = "production"

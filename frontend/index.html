@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Dublin Running Community</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏃‍♂️ Dublin Running Community</h1>
+            <p class="subtitle">Join our friendly running group</p>
+        </header>
+
+        <form id="applicationForm">
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required 
+                       placeholder="Mario Rossi">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="mario@example.com">
+            </div>
+
+            <div class="form-group">
+                <label for="age">Age *</label>
+                <input type="number" id="age" name="age" required 
+                       min="18" max="100" placeholder="35">
+            </div>
+
+            <div class="form-group">
+                <label for="level">Running Level *</label>
+                <select id="level" name="level" required>
+                    <option value="">Select your level</option>
+                    <option value="beginner">Beginner - Just starting out</option>
+                    <option value="intermediate">Intermediate - Regular runner</option>
+                    <option value="advanced">Advanced - Experienced runner</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="goal">Primary Goal *</label>
+                <select id="goal" name="goal" required>
+                    <option value="">Select your goal</option>
+                    <option value="5k">5K</option>
+                    <option value="10k">10K</option>
+                    <option value="half_marathon">Half Marathon</option>
+                    <option value="marathon">Marathon</option>
+                    <option value="fitness">General Fitness</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Availability * (select at least one)</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="availability" value="monday_morning">
+                        Monday Morning
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="availability" value="monday_evening">
+                        Monday Evening
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="availability" value="wednesday_morning">
+                        Wednesday Morning
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="availability" value="wednesday_evening">
+                        Wednesday Evening
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="availability" value="saturday_morning">
+                        Saturday Morning
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="availability" value="sunday_morning">
+                        Sunday Morning
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="dublin_zone">Preferred Zone in Dublin *</label>
+                <select id="dublin_zone" name="dublin_zone" required>
+                    <option value="">Select preferred zone</option>
+                    <option value="city_centre">City Centre</option>
+                    <option value="northside">Northside</option>
+                    <option value="southside">Southside</option>
+                    <option value="docklands">Docklands</option>
+                    <option value="phoenix_park">Phoenix Park</option>
+                    <option value="coastal">Coastal (Howth, Dun Laoghaire)</option>
+                    <option value="any">Any - I'm flexible</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="current_pace">Current Pace (min/km)</label>
+                <input type="text" id="current_pace" name="current_pace" 
+                       placeholder="e.g., 5:30">
+                <small>Optional - helps us match you with the right group</small>
+            </div>
+
+            <div class="form-group">
+                <label for="experience">Previous Running Experience</label>
+                <textarea id="experience" name="experience" rows="4" 
+                          placeholder="Tell us about your running background, previous groups, races, etc."></textarea>
+                <small>Optional but helpful</small>
+            </div>
+
+            <button type="submit" class="submit-btn">Submit Application</button>
+        </form>
+
+        <div id="successMessage" class="success-message" style="display: none;">
+            <h3>✅ Application Submitted!</h3>
+            <p>Thank you for joining our community. We'll be in touch soon!</p>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;">
+            <h3>❌ Submission Failed</h3>
+            <p id="errorText"></p>
+        </div>
+    </div>
+
+    <script>
+        // CAMBIA QUESTO URL con l'URL del tuo Cloud Run service dopo il deploy
+        const API_URL = 'http://localhost:8000';  // Per sviluppo locale
+        // const API_URL = 'https://runner-platform-api-xxx.run.app';  // Per produzione
+
+        document.getElementById('applicationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Nascondi messaggi precedenti
+            document.getElementById('successMessage').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+
+            // Raccogli dati form
+            const formData = new FormData(e.target);
+            
+            // Gestisci checkboxes (availability)
+            const availability = [];
+            document.querySelectorAll('input[name="availability"]:checked').forEach((cb) => {
+                availability.push(cb.value);
+            });
+
+            if (availability.length === 0) {
+                document.getElementById('errorText').textContent = 
+                    'Please select at least one availability slot.';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+
+            // Prepara payload
+            const payload = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                age: parseInt(formData.get('age')),
+                level: formData.get('level'),
+                goal: formData.get('goal'),
+                availability: availability,
+                dublin_zone: formData.get('dublin_zone'),
+                current_pace: formData.get('current_pace') || null,
+                experience: formData.get('experience') || null
+            };
+
+            // Invia al backend
+            try {
+                const response = await fetch(`${API_URL}/api/applications`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Submission failed');
+                }
+
+                // Success!
+                document.getElementById('applicationForm').reset();
+                document.getElementById('successMessage').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorText').textContent = 
+                    error.message || 'An error occurred. Please try again.';
+                document.getElementById('errorMessage').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    </script>
+</body>
+</html>

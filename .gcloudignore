@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+
+# Git
+.git/
+.gitignore
+
+# Terraform
+terraform/
+
+# Frontend (non serve nel container backend)
+frontend/
+
+# Docs
+README.md
+*.md
+
+# CI/CD
+.github/
+
+# Local dev
+.env
+key.json
